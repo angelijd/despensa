@@ -1,0 +1,16 @@
+{
+  "name": "despensa",
+  "version": "1.0.0",
+  "description": "Gestão de armário e geladeira — estoque, validade, lista de compras e pergunta livre com IA",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.17.3",
+    "express": "^4.19.2"
+  }
+}
