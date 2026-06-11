@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#04342C" />
+  <title>Despensa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>Despensa</h1>
+    <span id="today-label" class="today"></span>
+  </header>
+
+  <main id="main">
+    <!-- DESPENSA -->
+    <section id="view-estoque" class="view active">
+      <div class="searchrow">
+        <input id="search" type="search" placeholder="Buscar alimento ou lugar…" autocomplete="off" />
+      </div>
+      <div class="chips" id="place-chips">
+        <button class="chip active" data-place="">Tudo</button>
+        <button class="chip" data-place="geladeira">Geladeira</button>
+        <button class="chip" data-place="armario">Armário</button>
+        <button class="chip" data-place="freezer">Freezer</button>
+      </div>
+      <ul id="items-list" class="cards"></ul>
+      <p id="items-empty" class="empty hidden">Nada por aqui ainda. Toque em <strong>+</strong> para cadastrar o primeiro alimento.</p>
+    </section>
+
+    <!-- LISTA DE COMPRAS -->
+    <section id="view-compras" class="view">
+      <form id="shopping-form" class="addrow" onsubmit="return false;">
+        <input id="shopping-input" type="text" placeholder="Adicionar à lista…" autocomplete="off" />
+        <button id="shopping-add" class="btn-amber" type="button">Adicionar</button>
+      </form>
+      <ul id="shopping-list" class="cards"></ul>
+      <p id="shopping-empty" class="empty hidden">Lista vazia. Itens que acabarem entram aqui sozinhos.</p>
+      <button id="clear-done" class="btn-ghost hidden">Limpar comprados</button>
+    </section>
+
+    <!-- ALERTAS -->
+    <section id="view-alertas" class="view">
+      <ul id="alerts-list" class="cards"></ul>
+      <p id="alerts-empty" class="empty hidden">Tudo em dia — nada perto de vencer ou estragar. 🎉</p>
+      <p class="footnote">Regra: validade → aviso 5 dias antes · vida útil → aviso 2 dias antes.</p>
+    </section>
+
+    <!-- PERGUNTAR -->
+    <section id="view-perguntar" class="view">
+      <div id="chat-log" class="chatlog">
+        <div class="bubble bot">Oi! Pergunte qualquer coisa sobre a despensa: onde está um alimento, o que está perto de vencer, o que pôr na lancheira, ou se dá pra fazer uma receita com o que tem em casa.</div>
+      </div>
+      <div class="chips suggest">
+        <button class="chip" data-q="Que frutas colocar na lancheira hoje?">Lancheira 🍎</button>
+        <button class="chip" data-q="Tenho ingredientes para fazer bolo de fubá?">Dá pra fazer…?</button>
+        <button class="chip" data-q="O que está perto de vencer ou estragar?">Perto de vencer?</button>
+        <button class="chip" data-q="Onde está o arroz?">Onde está…?</button>
+      </div>
+      <form id="ask-form" class="addrow" onsubmit="return false;">
+        <input id="ask-input" type="text" placeholder="Onde está o fermento?" autocomplete="off" />
+        <button id="ask-send" class="btn-amber" type="button">Enviar</button>
+      </form>
+    </section>
+  </main>
+
+  <button id="fab" title="Cadastrar alimento">+</button>
+
+  <nav class="tabbar">
+    <button class="tab active" data-view="estoque"><span class="ico">🥫</span>Despensa<b id="badge-estoque" class="badge hidden"></b></button>
+    <button class="tab" data-view="compras"><span class="ico">🛒</span>Comprar<b id="badge-compras" class="badge hidden"></b></button>
+    <button class="tab" data-view="alertas"><span class="ico">⏳</span>Alertas<b id="badge-alertas" class="badge alert hidden"></b></button>
+    <button class="tab" data-view="perguntar"><span class="ico">💬</span>Perguntar</button>
+  </nav>
+
+  <!-- SHEET DE CADASTRO -->
+  <div id="sheet-backdrop" class="backdrop hidden"></div>
+  <div id="sheet" class="sheet hidden" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+    <div class="sheet-handle"></div>
+    <h2 id="sheet-title">Cadastrar alimento</h2>
+
+    <button id="scan-btn" class="btn-scan" type="button">📷 Ler código de barras</button>
+    <div id="scanner-wrap" class="hidden">
+      <video id="scanner-video" playsinline muted></video>
+      <button id="scan-stop" class="btn-ghost" type="button">Cancelar leitura</button>
+    </div>
+    <p id="scan-status" class="footnote hidden"></p>
+
+    <label class="field">
+      <span>Nome</span>
+      <input id="f-name" type="text" placeholder="Feijão carioca 1kg" autocomplete="off" />
+    </label>
+
+    <label class="field">
+      <span>Onde fica</span>
+      <select id="f-place">
+        <option value="armario">Armário</option>
+        <option value="geladeira">Geladeira</option>
+        <option value="freezer">Freezer</option>
+        <option value="outro">Outro</option>
+      </select>
+    </label>
+
+    <label class="field">
+      <span>Localização detalhada <em>(opcional)</em></span>
+      <input id="f-location" type="text" placeholder="Embaixo da pia, prateleira do fundo, saco azul e prata" autocomplete="off" />
+    </label>
+
+    <div class="field">
+      <span>Controle de validade</span>
+      <div class="seg">
+        <button id="seg-validade" class="segbtn active" type="button">Data de validade</button>
+        <button id="seg-vida" class="segbtn" type="button">Vida útil (dias)</button>
+      </div>
+    </div>
+
+    <label class="field" id="wrap-validade">
+      <span>Vence em</span>
+      <input id="f-date" type="date" />
+    </label>
+
+    <label class="field hidden" id="wrap-vida">
+      <span>Dura quantos dias?</span>
+      <input id="f-dias" type="number" min="0" inputmode="numeric" placeholder="Ex.: banana ≈ 5" />
+    </label>
+
+    <input type="hidden" id="f-ean" />
+    <input type="hidden" id="f-editing" />
+
+    <div class="sheet-actions">
+      <button id="sheet-cancel" class="btn-ghost" type="button">Cancelar</button>
+      <button id="sheet-save" class="btn-green" type="button">Salvar</button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
